@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+*.jpg
+*.png
+
+# Backend working directories
+backend/uploads/
+backend/output/
+
+# Frontend build
+frontend/dist/
