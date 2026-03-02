@@ -27,10 +27,11 @@ function proceed() {
 
     <div class="suggestions-grid">
       <div
-        v-for="suggestion in store.suggestions"
+        v-for="(suggestion, idx) in store.suggestions"
         :key="suggestion.id"
         class="suggestion-card"
         :class="{ selected: store.selectedDirection?.id === suggestion.id }"
+        :style="{ animationDelay: (idx * 0.1) + 's' }"
         @click="selectDirection(suggestion)"
       >
         <h3 class="suggestion-title">{{ suggestion.title }}</h3>
@@ -62,106 +63,97 @@ function proceed() {
 
 .picker-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .picker-header h2 {
-  font-size: 1.5em;
+  font-family: var(--font-display);
+  font-size: 1.6em;
   color: #fff;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 8px rgba(0, 60, 20, 0.12);
 }
 
 .picker-subtitle {
-  color: #888;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95em;
+}
+
+.picker-subtitle strong {
+  color: #fff;
 }
 
 .suggestions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .suggestion-card {
-  background: #1a1a2e;
-  border: 2px solid #2a2a4a;
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardIn 0.5s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .suggestion-card:hover {
-  border-color: #6c63ff;
-  transform: translateY(-2px);
+  background: var(--glass-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .suggestion-card.selected {
-  border-color: #6c63ff;
-  background: #1e1e3e;
-  box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 60, 20, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .suggestion-title {
+  font-family: var(--font-display);
   font-size: 1.15em;
-  color: #fff;
-  margin-bottom: 8px;
+  color: var(--text-on-glass);
+  margin-bottom: 10px;
 }
 
 .suggestion-description {
-  color: #aaa;
+  color: var(--text-on-glass-secondary);
   font-size: 0.9em;
-  line-height: 1.5;
-  margin-bottom: 12px;
+  line-height: 1.6;
+  margin-bottom: 16px;
 }
 
 .suggestion-tone {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  background: #252540;
-  color: #6c63ff;
-  font-size: 0.8em;
-  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(27, 94, 47, 0.12);
+  border: 1px solid rgba(27, 94, 47, 0.2);
+  color: var(--accent);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.suggestion-card.selected .suggestion-tone {
+  background: rgba(27, 94, 47, 0.2);
+  border-color: rgba(27, 94, 47, 0.35);
 }
 
 .actions {
   display: flex;
   justify-content: center;
-  gap: 16px;
-}
-
-.btn {
-  padding: 12px 32px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background: #6c63ff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #5a52e0;
-}
-
-.btn-secondary {
-  background: #2a2a4a;
-  color: #aaa;
-}
-
-.btn-secondary:hover {
-  background: #353560;
+  gap: 14px;
 }
 </style>

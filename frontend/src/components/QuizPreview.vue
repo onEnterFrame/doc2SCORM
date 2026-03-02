@@ -30,15 +30,19 @@ defineProps<{
 
 <style scoped>
 .quiz-preview {
-  background: #1a1a2e;
-  border: 1px solid #2a2a4a;
-  border-radius: 12px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow);
 }
 
 .quiz-title {
-  color: #fff;
+  font-family: var(--font-display);
+  color: var(--text-on-glass);
   font-size: 1.1em;
   margin-bottom: 20px;
 }
@@ -48,7 +52,7 @@ defineProps<{
 }
 
 .question-text {
-  color: #ddd;
+  color: var(--text-on-glass);
   font-weight: 600;
   margin-bottom: 10px;
 }
@@ -60,10 +64,10 @@ defineProps<{
 }
 
 .choice {
-  padding: 10px 14px;
-  border: 1px solid #2a2a4a;
-  border-radius: 8px;
-  color: #aaa;
+  padding: 11px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-on-glass-secondary);
   font-size: 0.9em;
   display: flex;
   align-items: center;
@@ -71,25 +75,25 @@ defineProps<{
 }
 
 .choice.correct {
-  border-color: #2d5a2d;
-  background: #1a2a1a;
-  color: #4caf50;
+  background: rgba(27, 94, 47, 0.12);
+  border-color: rgba(27, 94, 47, 0.3);
+  color: var(--accent);
 }
 
 .choice-letter {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #252540;
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8em;
+  font-size: 0.78em;
   font-weight: 700;
   flex-shrink: 0;
 }
 
 .choice.correct .choice-letter {
-  background: #2d5a2d;
+  background: rgba(27, 94, 47, 0.2);
 }
 </style>

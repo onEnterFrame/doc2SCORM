@@ -21,7 +21,13 @@ function startOver() {
 <template>
   <div class="download-container">
     <div class="download-card">
-      <div class="success-icon">&#10003;</div>
+      <div class="success-icon">
+        <div class="success-ring"></div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
       <h2>Your SCORM Package is Ready</h2>
 
       <div v-if="store.courseData" class="course-summary">
@@ -58,6 +64,11 @@ function startOver() {
 
       <div class="download-actions">
         <button class="btn btn-primary btn-large" @click="download">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
           Download SCORM 1.2 Package
         </button>
         <button class="btn btn-secondary" @click="store.currentStep = 4">
@@ -79,48 +90,74 @@ function startOver() {
 .download-container {
   display: flex;
   justify-content: center;
+  animation: fadeUp 0.5s ease;
 }
 
 .download-card {
   max-width: 560px;
   width: 100%;
-  background: #1a1a2e;
-  border: 1px solid #2a2a4a;
-  border-radius: 16px;
-  padding: 40px;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 44px 40px;
   text-align: center;
+  box-shadow: var(--shadow-lg);
 }
 
 .success-icon {
-  width: 64px;
-  height: 64px;
+  position: relative;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: #1e3a1e;
-  color: #4caf50;
-  font-size: 2em;
+  background: rgba(27, 94, 47, 0.15);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 24px;
+  animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+.success-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(27, 94, 47, 0.25);
+  animation: ringExpand 0.8s ease 0.3s both;
+}
+
+@keyframes checkPop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ringExpand {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .download-card h2 {
-  color: #fff;
-  font-size: 1.4em;
-  margin-bottom: 24px;
-}
-
-.course-summary {
-  background: #15152a;
-  border-radius: 12px;
-  padding: 20px;
+  font-family: var(--font-display);
+  color: var(--text-on-glass);
+  font-size: 1.5em;
   margin-bottom: 28px;
 }
 
+.course-summary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 22px;
+  margin-bottom: 32px;
+}
+
 .course-summary h3 {
-  color: #6c63ff;
+  color: var(--accent);
+  font-family: var(--font-display);
   font-size: 1.1em;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .summary-stats {
@@ -136,70 +173,39 @@ function startOver() {
 }
 
 .stat-value {
-  font-size: 1.4em;
+  font-family: var(--font-display);
+  font-size: 1.5em;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-on-glass);
 }
 
 .stat-label {
-  font-size: 0.75em;
-  color: #888;
+  font-size: 0.72em;
+  color: var(--text-on-glass-secondary);
   margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
 .download-actions {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
-}
-
-.btn {
-  padding: 12px 32px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  margin-bottom: 24px;
 }
 
 .btn-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 16px 32px;
-  font-size: 1.1em;
-}
-
-.btn-primary {
-  background: #6c63ff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #5a52e0;
-}
-
-.btn-secondary {
-  background: #2a2a4a;
-  color: #aaa;
-}
-
-.btn-secondary:hover {
-  background: #353560;
-}
-
-.btn-ghost {
-  background: transparent;
-  color: #666;
-  border: 1px solid #333;
-}
-
-.btn-ghost:hover {
-  color: #aaa;
-  border-color: #555;
+  font-size: 1.05em;
 }
 
 .scorm-note {
-  color: #666;
+  color: var(--text-on-glass-secondary);
   font-size: 0.8em;
 }
 </style>

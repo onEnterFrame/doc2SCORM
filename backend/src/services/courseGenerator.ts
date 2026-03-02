@@ -54,16 +54,23 @@ function parseScenes(text: string): ParsedScene[] {
     // Also check if block starts with a field (no leading newline)
     const leadingField = block.match(/^([A-Z][A-Z_0-9]*):\s*/);
     if (leadingField) {
-      fieldStarts.push({ name: leadingField[1], start: leadingField[0].length });
+      fieldStarts.push({
+        name: leadingField[1],
+        start: leadingField[0].length,
+      });
     }
     while ((fMatch = fieldSplitRegex.exec(block)) !== null) {
-      fieldStarts.push({ name: fMatch[1], start: fMatch.index + fMatch[0].length });
+      fieldStarts.push({
+        name: fMatch[1],
+        start: fMatch.index + fMatch[0].length,
+      });
     }
     for (let fi = 0; fi < fieldStarts.length; fi++) {
       const start = fieldStarts[fi].start;
-      const end = fi + 1 < fieldStarts.length
-        ? block.lastIndexOf("\n", fieldStarts[fi + 1].start)
-        : block.length;
+      const end =
+        fi + 1 < fieldStarts.length
+          ? block.lastIndexOf("\n", fieldStarts[fi + 1].start)
+          : block.length;
       const value = block.substring(start, end).trim();
       if (value) {
         fieldMap.set(fieldStarts[fi].name, value);
@@ -162,6 +169,10 @@ export async function generateCourse(
   });
 
   const parts = response.candidates?.[0]?.content?.parts ?? [];
+  console.log(
+    "Gemini response parts:",
+    parts.map((p) => p.text?.substring(0, 100) || "[image]"),
+  );
 
   // Collect all text and track image positions
   let fullText = "";

@@ -48,7 +48,6 @@ async function handleFile(file: File) {
   store.fileName = file.name;
 
   try {
-    // Upload and extract text
     const formData = new FormData();
     formData.append("document", file);
 
@@ -57,7 +56,6 @@ async function handleFile(file: File) {
     store.extractedText = uploadRes.data.extractedText;
     store.wordCount = uploadRes.data.wordCount;
 
-    // Get story suggestions
     const suggestRes = await api.post("/api/suggest-directions", {
       sessionId: store.sessionId,
       extractedText: store.extractedText,
@@ -90,7 +88,14 @@ async function handleFile(file: File) {
         <p class="upload-hint">Extracting text and generating story directions</p>
       </div>
       <div v-else class="upload-prompt">
-        <div class="upload-icon">&#128196;</div>
+        <div class="upload-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <polyline points="9 15 12 12 15 15"/>
+          </svg>
+        </div>
         <p class="upload-title">Drop your document here</p>
         <p class="upload-hint">or click to browse</p>
         <div class="file-types">
@@ -110,7 +115,9 @@ async function handleFile(file: File) {
       @change="onFileSelect"
     />
 
-    <p v-if="error" class="error">{{ error }}</p>
+    <Transition name="error-fade">
+      <p v-if="error" class="error">{{ error }}</p>
+    </Transition>
   </div>
 </template>
 
@@ -124,27 +131,32 @@ async function handleFile(file: File) {
 .drop-zone {
   width: 100%;
   max-width: 600px;
-  min-height: 280px;
-  border: 2px dashed #333;
-  border-radius: 16px;
+  min-height: 300px;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
-  background: #1a1a2e;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
 }
 
 .drop-zone:hover,
 .drop-zone.dragging {
-  border-color: #6c63ff;
-  background: #1a1a3e;
+  border-color: rgba(255, 255, 255, 0.7);
+  background: var(--glass-hover);
+  box-shadow: 0 8px 32px rgba(0, 60, 20, 0.12);
+  transform: translateY(-2px);
 }
 
 .drop-zone.uploading {
   cursor: default;
-  border-color: #6c63ff;
+  border-color: rgba(255, 255, 255, 0.5);
   border-style: solid;
+  transform: none;
 }
 
 .upload-prompt,
@@ -154,19 +166,21 @@ async function handleFile(file: File) {
 }
 
 .upload-icon {
-  font-size: 3em;
-  margin-bottom: 12px;
+  color: var(--text-on-glass);
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 
 .upload-title {
-  font-size: 1.2em;
+  font-family: var(--font-display);
+  font-size: 1.3em;
   font-weight: 600;
-  color: #fff;
-  margin-bottom: 4px;
+  color: var(--text-on-glass);
+  margin-bottom: 6px;
 }
 
 .upload-hint {
-  color: #888;
+  color: var(--text-on-glass-secondary);
   font-size: 0.9em;
 }
 
@@ -174,43 +188,56 @@ async function handleFile(file: File) {
   display: flex;
   gap: 8px;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 .file-type {
-  padding: 4px 12px;
-  border-radius: 12px;
-  background: #252540;
-  color: #aaa;
-  font-size: 0.8em;
-  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--text-on-glass);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #333;
-  border-top-color: #6c63ff;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--text-on-glass);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 16px;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .upload-status {
-  color: #fff;
+  color: var(--text-on-glass);
   font-size: 1em;
   margin-bottom: 4px;
 }
 
+.upload-status strong {
+  font-weight: 700;
+}
+
 .error {
-  color: #ff6b6b;
+  color: #b71c1c;
   margin-top: 16px;
   font-size: 0.9em;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(183, 28, 28, 0.2);
+  border-radius: var(--radius-sm);
 }
+
+.error-fade-enter-active { animation: fadeUp 0.3s ease; }
+.error-fade-leave-active { animation: fadeUp 0.2s ease reverse; }
 </style>

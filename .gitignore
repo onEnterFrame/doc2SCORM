@@ -4,6 +4,8 @@ dist
 *.jpg
 *.png
 
+CLAUDE.md
+
 # Backend working directories
 backend/uploads/
 backend/output/

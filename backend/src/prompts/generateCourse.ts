@@ -39,7 +39,10 @@ RECOMMENDED: (number of the best option, e.g. 3)
 
 Make sure options feel like real choices with real consequences. Bad choices should explain what could go wrong. The recommended choice should feel earned, not obvious.
 
-Then immediately generate an illustration matching the VISUAL_DIRECTION. The illustration should be professional, clean, and suitable for workplace training.
+Then immediately generate an illustration matching the VISUAL_DIRECTION.
+
+CRITICAL — VISUAL STYLE CONSISTENCY:
+Before generating any images, decide on ONE visual style for the entire course and use it for EVERY illustration. Choose from: flat vector illustration, isometric illustration, watercolor illustration, or minimal line art. Do NOT mix styles — no photorealistic images for some scenes and illustrations for others. Every image in the course must look like it belongs to the same visual set, with a consistent color palette, level of detail, and rendering technique throughout. State your chosen style in the VISUAL_DIRECTION of the first scene (e.g. "Style: flat vector illustration. ...") so all subsequent scenes follow it.
 
 After all screens in each module, output a quiz block:
 
