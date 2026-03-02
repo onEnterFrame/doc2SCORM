@@ -181,6 +181,17 @@
       course = data;
       buildScreenList();
 
+      // Apply theme if present
+      if (course.theme) {
+        var t = course.theme;
+        var root = document.documentElement.style;
+        root.setProperty("--gradient-start", t.gradientStart);
+        root.setProperty("--gradient-end", t.gradientEnd);
+        root.setProperty("--accent", t.accent);
+        root.setProperty("--text-on-glass", t.textOnGlass);
+        root.setProperty("--text-on-glass-secondary", t.textOnGlassSecondary);
+      }
+
       // Show UI
       document.getElementById("player-header").style.display = "";
       document.getElementById("progress-track").style.display = "";

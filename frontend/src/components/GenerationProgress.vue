@@ -51,6 +51,9 @@ async function runGeneration() {
       direction: store.selectedDirection,
     });
     store.courseData = courseRes.data.course;
+    if (store.courseData?.theme) {
+      store.applyTheme(store.courseData.theme);
+    }
 
     store.generationStatus = "generating-audio";
     await api.post("/api/generate-audio", {

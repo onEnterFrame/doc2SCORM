@@ -4,6 +4,7 @@ import { ai, Modality } from "./gemini.js";
 import { buildCoursePrompt } from "../prompts/generateCourse.js";
 import type {
   Course,
+  CourseTheme,
   Module,
   Screen,
   QuizQuestion,
@@ -32,6 +33,35 @@ interface ParsedScene {
 interface ParsedQuiz {
   moduleNum: number;
   questions: QuizQuestion[];
+}
+
+function parseTheme(text: string): CourseTheme | undefined {
+  const themeMatch = text.match(
+    /\[THEME\]\s*\n([\s\S]*?)(?=\[SCENE|\[QUIZ|$)/i,
+  );
+  if (!themeMatch) return undefined;
+
+  const block = themeMatch[1];
+  const get = (field: string): string => {
+    const m = block.match(new RegExp(`${field}:\\s*(.+)`, "i"));
+    return m ? m[1].trim() : "";
+  };
+
+  const gradientStart = get("GRADIENT_START");
+  const gradientEnd = get("GRADIENT_END");
+  const accent = get("ACCENT");
+  const textOnGlass = get("TEXT_ON_GLASS");
+  const textOnGlassSecondary = get("TEXT_ON_GLASS_SECONDARY");
+
+  if (!gradientStart || !accent) return undefined;
+
+  return {
+    gradientStart,
+    gradientEnd: gradientEnd || gradientStart,
+    accent,
+    textOnGlass: textOnGlass || accent,
+    textOnGlassSecondary: textOnGlassSecondary || `rgba(0,0,0,0.7)`,
+  };
 }
 
 function parseScenes(text: string): ParsedScene[] {
@@ -190,6 +220,7 @@ export async function generateCourse(
   }
 
   // Parse structured text
+  const theme = parseTheme(fullText);
   const scenes = parseScenes(fullText);
   const quizzes = parseQuizzes(fullText);
 
@@ -289,6 +320,7 @@ export async function generateCourse(
 
   const course: Course = {
     title: direction.title,
+    ...(theme && { theme }),
     modules,
   };
 

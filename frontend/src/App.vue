@@ -70,7 +70,51 @@ const steps = [
   box-sizing: border-box;
 }
 
+/* Register custom properties as <color> so the browser can interpolate them */
+@property --gradient-start {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #6abf78;
+}
+@property --gradient-end {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #7acc8e;
+}
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b5e2f;
+}
+@property --text-on-glass {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1a3a2a;
+}
+@property --text-on-glass-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(26, 58, 42, 0.7);
+}
+@property --orb-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(142, 216, 154, 0.4);
+}
+@property --orb-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(56, 142, 80, 0.25);
+}
+@property --orb-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(180, 230, 170, 0.3);
+}
+
 :root {
+  --gradient-start: #6abf78;
+  --gradient-end: #7acc8e;
   --glass: rgba(255, 255, 255, 0.22);
   --glass-hover: rgba(255, 255, 255, 0.32);
   --glass-border: rgba(255, 255, 255, 0.35);
@@ -91,6 +135,9 @@ const steps = [
   --text-dim: rgba(255, 255, 255, 0.5);
   --text-on-glass: #1a3a2a;
   --text-on-glass-secondary: rgba(26, 58, 42, 0.7);
+  --orb-1: rgba(142, 216, 154, 0.4);
+  --orb-2: rgba(56, 142, 80, 0.25);
+  --orb-3: rgba(180, 230, 170, 0.3);
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Space Grotesk", "Inter", sans-serif;
   --blur: blur(20px);
@@ -99,11 +146,20 @@ const steps = [
   --radius-pill: 100px;
   --shadow: 0 8px 32px rgba(0, 60, 20, 0.12);
   --shadow-lg: 0 16px 48px rgba(0, 60, 20, 0.18);
+  transition:
+    --gradient-start 1.2s ease,
+    --gradient-end 1.2s ease,
+    --accent 1.2s ease,
+    --text-on-glass 1.2s ease,
+    --text-on-glass-secondary 1.2s ease,
+    --orb-1 1.2s ease,
+    --orb-2 1.2s ease,
+    --orb-3 1.2s ease;
 }
 
 body {
   font-family: var(--font-body);
-  background: linear-gradient(135deg, #6abf78 0%, #4aaa64 30%, #52b07a 60%, #7acc8e 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
@@ -122,7 +178,7 @@ body {
 .bg-orb-1 {
   width: 600px;
   height: 600px;
-  background: rgba(142, 216, 154, 0.4);
+  background: var(--orb-1, rgba(142, 216, 154, 0.4));
   top: -150px;
   left: -100px;
 }
@@ -130,7 +186,7 @@ body {
 .bg-orb-2 {
   width: 500px;
   height: 500px;
-  background: rgba(56, 142, 80, 0.25);
+  background: var(--orb-2, rgba(56, 142, 80, 0.25));
   bottom: -120px;
   right: -80px;
   animation-delay: -7s;
@@ -140,7 +196,7 @@ body {
 .bg-orb-3 {
   width: 350px;
   height: 350px;
-  background: rgba(180, 230, 170, 0.3);
+  background: var(--orb-3, rgba(180, 230, 170, 0.3));
   top: 40%;
   left: 55%;
   animation-delay: -14s;

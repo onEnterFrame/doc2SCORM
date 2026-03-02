@@ -16,6 +16,21 @@ ${truncated}
 
 Generate a course with EXACTLY 2 modules, each with 3-4 screens.
 
+Before the first scene, output a theme block that matches the course content's mood and subject:
+
+[THEME]
+GRADIENT_START: (hex color for background gradient start, e.g. #6abf78)
+GRADIENT_END: (hex color for background gradient end, e.g. #7acc8e)
+ACCENT: (hex color for buttons and highlights, should be dark/saturated, e.g. #1b5e2f)
+TEXT_ON_GLASS: (hex color for dark readable text on white glass cards, e.g. #1a3a2a)
+TEXT_ON_GLASS_SECONDARY: (rgba color for secondary text on glass, e.g. rgba(26,58,42,0.7))
+
+Pick colors that evoke the course topic. Examples:
+- Cybersecurity → deep blues/teals (#1a2f4a, #2563eb)
+- Cooking/food → warm amber/terracotta (#b45309, #d97706)
+- Healthcare → clean blue-green (#0d9488, #115e59)
+- Finance → navy/gold (#1e3a5f, #b8860b)
+
 For EACH screen, output the following structured text block, then immediately generate an illustration:
 
 [SCENE module.screen]
@@ -61,6 +76,7 @@ Important rules:
 - Make interactions meaningful — reflections should provoke thinking, decisions should have consequences
 - Quiz questions should test key concepts from the source material
 - Maintain the ${direction.tone} tone throughout
+- NEVER reference images by filename or mention "image" in any text field (STORY_TEXT, NARRATION, ON_SCREEN_TEXT, INTERACTION_PROMPT, OPTION_*, FEEDBACK_*). The illustrations are displayed alongside the text automatically — the learner already sees them. Describe concepts directly instead of saying "in the image" or "as shown in image_0.png".
 
 Begin generating the course now.`;
 }

@@ -1,5 +1,13 @@
 import { defineStore } from "pinia";
-import type { Course, StorySuggestion } from "../types/course";
+import type { Course, CourseTheme, StorySuggestion } from "../types/course";
+
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 export type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -34,7 +42,30 @@ export const useCourseStore = defineStore("course", {
     errorMessage: "",
   }),
   actions: {
+    applyTheme(theme: CourseTheme) {
+      const root = document.documentElement;
+      root.style.setProperty("--gradient-start", theme.gradientStart);
+      root.style.setProperty("--gradient-end", theme.gradientEnd);
+      root.style.setProperty("--accent", theme.accent);
+      root.style.setProperty("--text-on-glass", theme.textOnGlass);
+      root.style.setProperty("--text-on-glass-secondary", theme.textOnGlassSecondary);
+      root.style.setProperty("--orb-1", hexToRgba(theme.gradientEnd, 0.4));
+      root.style.setProperty("--orb-2", hexToRgba(theme.accent, 0.25));
+      root.style.setProperty("--orb-3", hexToRgba(theme.gradientStart, 0.3));
+    },
+    resetTheme() {
+      const root = document.documentElement;
+      root.style.removeProperty("--gradient-start");
+      root.style.removeProperty("--gradient-end");
+      root.style.removeProperty("--accent");
+      root.style.removeProperty("--text-on-glass");
+      root.style.removeProperty("--text-on-glass-secondary");
+      root.style.removeProperty("--orb-1");
+      root.style.removeProperty("--orb-2");
+      root.style.removeProperty("--orb-3");
+    },
     reset() {
+      this.resetTheme();
       this.currentStep = 1;
       this.sessionId = null;
       this.extractedText = "";

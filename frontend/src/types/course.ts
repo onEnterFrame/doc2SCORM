@@ -1,5 +1,14 @@
+export interface CourseTheme {
+  gradientStart: string;
+  gradientEnd: string;
+  accent: string;
+  textOnGlass: string;
+  textOnGlassSecondary: string;
+}
+
 export interface Course {
   title: string;
+  theme?: CourseTheme;
   modules: Module[];
 }
 
