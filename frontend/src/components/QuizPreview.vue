@@ -75,8 +75,8 @@ defineProps<{
 }
 
 .choice.correct {
-  background: rgba(27, 94, 47, 0.12);
-  border-color: rgba(27, 94, 47, 0.3);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
   color: var(--accent);
 }
 
@@ -94,6 +94,6 @@ defineProps<{
 }
 
 .choice.correct .choice-letter {
-  background: rgba(27, 94, 47, 0.2);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 </style>

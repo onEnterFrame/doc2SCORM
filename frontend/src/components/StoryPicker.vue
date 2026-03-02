@@ -138,8 +138,8 @@ function proceed() {
   display: inline-block;
   padding: 4px 12px;
   border-radius: var(--radius-pill);
-  background: rgba(27, 94, 47, 0.12);
-  border: 1px solid rgba(27, 94, 47, 0.2);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
   color: var(--accent);
   font-size: 0.78em;
   font-weight: 600;
@@ -147,8 +147,8 @@ function proceed() {
 }
 
 .suggestion-card.selected .suggestion-tone {
-  background: rgba(27, 94, 47, 0.2);
-  border-color: rgba(27, 94, 47, 0.35);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .actions {

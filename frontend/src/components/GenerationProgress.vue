@@ -204,7 +204,7 @@ onMounted(() => {
 .spinner-ring {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba(27, 94, 47, 0.2);
+  border: 3px solid color-mix(in srgb, var(--accent) 20%, transparent);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.9s linear infinite;

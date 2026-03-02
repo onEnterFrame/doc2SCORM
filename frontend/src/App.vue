@@ -361,13 +361,13 @@ body {
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(27, 94, 47, 0.25);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(27, 94, 47, 0.35);
-  background: #174e28;
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent) 85%, black);
 }
 
 .btn-primary:active:not(:disabled) {

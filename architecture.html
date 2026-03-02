@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doc2SCORM Director — Architecture Diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #0a0a0f;
+        color: #e2e8f0;
+        font-family: "Space Grotesk", sans-serif;
+        min-height: 100vh;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6abf78, #34d399, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 6px;
+      }
+      .subtitle {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin-bottom: 40px;
+      }
+
+      .diagram {
+        position: relative;
+        width: 1100px;
+        height: 740px;
+      }
+
+      /* --- Boxes --- */
+      .box {
+        position: absolute;
+        border-radius: 16px;
+        padding: 18px 22px;
+        backdrop-filter: blur(12px);
+        border: 1px solid;
+        transition: transform 0.2s;
+      }
+      .box:hover {
+        transform: translateY(-2px);
+      }
+      .box h3 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+      }
+      .box .items {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        line-height: 1.7;
+        color: #cbd5e1;
+      }
+      .box .items .highlight {
+        color: #f0abfc;
+        font-weight: 500;
+      }
+
+      /* Browser */
+      .box.browser {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.3);
+        left: 0;
+        top: 60;
+        width: 260px;
+      }
+      .box.browser h3 {
+        color: #60a5fa;
+      }
+
+      /* Backend */
+      .box.backend {
+        background: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.3);
+        left: 410px;
+        top: 60px;
+        width: 260px;
+      }
+      .box.backend h3 {
+        color: #34d399;
+      }
+
+      /* Storage */
+      .box.storage {
+        background: rgba(245, 158, 11, 0.08);
+        border-color: rgba(245, 158, 11, 0.3);
+        left: 410px;
+        top: 500px;
+        width: 260px;
+      }
+      .box.storage h3 {
+        color: #fbbf24;
+      }
+
+      /* Gemini Models */
+      .box.gemini {
+        background: rgba(217, 70, 239, 0.06);
+        border-color: rgba(217, 70, 239, 0.3);
+        width: 280px;
+      }
+      .box.gemini h3 {
+        color: #e879f9;
+      }
+      .gemini-suggest {
+        right: 0;
+        top: 60px;
+      }
+      .gemini-course {
+        right: 0;
+        top: 290px;
+      }
+      .gemini-tts {
+        right: 0;
+        top: 520px;
+      }
+
+      .model-tag {
+        display: inline-block;
+        background: rgba(217, 70, 239, 0.15);
+        border: 1px solid rgba(217, 70, 239, 0.25);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        color: #e879f9;
+        margin-top: 4px;
+      }
+
+      /* --- Connection Lines (SVG) --- */
+      svg.connections {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .conn {
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+      .conn.rest {
+        stroke: #34d399;
+        stroke-dasharray: 6 4;
+      }
+      .conn.gemini-call {
+        stroke: #c084fc;
+        stroke-dasharray: 8 4;
+      }
+      .conn.storage-call {
+        stroke: #fbbf24;
+        stroke-dasharray: 4 4;
+      }
+
+      /* --- Labels on connections --- */
+      .conn-label {
+        position: absolute;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+      }
+      .conn-label.rest-label {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+      .conn-label.gemini-label {
+        background: rgba(192, 132, 252, 0.12);
+        color: #c084fc;
+        border: 1px solid rgba(192, 132, 252, 0.2);
+      }
+      .conn-label.storage-label {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+
+      /* --- Legend --- */
+      .legend {
+        display: flex;
+        gap: 24px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
+      .legend-line {
+        width: 28px;
+        height: 3px;
+        border-radius: 2px;
+      }
+      .legend-line.l-rest {
+        background: #34d399;
+        opacity: 0.7;
+      }
+      .legend-line.l-gemini {
+        background: #c084fc;
+        opacity: 0.7;
+      }
+      .legend-line.l-storage {
+        background: #fbbf24;
+        opacity: 0.7;
+      }
+
+      .deploy-badge {
+        position: absolute;
+        bottom: -2px;
+        right: 0;
+        font-size: 0.6rem;
+        color: #94a3b8;
+        background: rgba(100, 116, 139, 0.1);
+        border: 1px solid rgba(100, 116, 139, 0.2);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .section-label {
+        position: absolute;
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #475569;
+      }
+
+      /* --- Data Pipeline --- */
+      .pipeline-section {
+        margin-top: 32px;
+        text-align: center;
+      }
+      .pipeline-title {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #475569;
+        margin-bottom: 14px;
+      }
+      .pipeline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+      }
+      .pipe-step {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .pipe-arrow {
+        color: #334155;
+        font-size: 1rem;
+        padding: 0 8px;
+      }
+      .pipe-blue {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.25);
+      }
+      .pipe-green {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+      .pipe-purple {
+        background: rgba(192, 132, 252, 0.12);
+        color: #c084fc;
+        border: 1px solid rgba(192, 132, 252, 0.2);
+      }
+      .pipe-yellow {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.25);
+      }
+
+      .no-db-badge {
+        display: inline-block;
+        font-size: 0.6rem;
+        color: #94a3b8;
+        background: rgba(100, 116, 139, 0.1);
+        border: 1px solid rgba(100, 116, 139, 0.2);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-family: "JetBrains Mono", monospace;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Doc2SCORM Director</h1>
+    <p class="subtitle">
+      System Architecture &mdash; Gemini API Developer Competition
+    </p>
+
+    <div class="diagram">
+      <!-- Section labels -->
+      <span class="section-label" style="left: 70px; top: 38px">Client</span>
+      <span class="section-label" style="left: 480px; top: 38px"
+        >Backend</span
+      >
+      <span class="section-label" style="right: 80px; top: 38px"
+        >Gemini AI</span
+      >
+
+      <!-- SVG Connections -->
+      <svg class="connections" viewBox="0 0 1100 740">
+        <defs>
+          <marker
+            id="arrow-green"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+            fill="#34d399"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker
+            id="arrow-purple"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+            fill="#c084fc"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker
+            id="arrow-yellow"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+            fill="#fbbf24"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <!-- Browser -> Backend (REST) -->
+        <path
+          class="conn rest"
+          d="M 260 180 L 410 180"
+          marker-end="url(#arrow-green)"
+        />
+
+        <!-- Backend -> Gemini Suggestions -->
+        <path
+          class="conn gemini-call"
+          d="M 670 130 L 820 130"
+          marker-end="url(#arrow-purple)"
+        />
+
+        <!-- Backend -> Gemini Course Generation -->
+        <path
+          class="conn gemini-call"
+          d="M 670 240 L 820 370"
+          marker-end="url(#arrow-purple)"
+        />
+
+        <!-- Backend -> Gemini TTS -->
+        <path
+          class="conn gemini-call"
+          d="M 670 320 C 720 440, 780 520, 820 590"
+          marker-end="url(#arrow-purple)"
+        />
+
+        <!-- Backend -> Storage -->
+        <path
+          class="conn storage-call"
+          d="M 540 420 L 540 500"
+          marker-end="url(#arrow-yellow)"
+        />
+      </svg>
+
+      <!-- Connection labels -->
+      <span class="conn-label rest-label" style="left: 284px; top: 166px"
+        >REST API</span
+      >
+      <span class="conn-label gemini-label" style="left: 700px; top: 116px"
+        >generateContent (JSON)</span
+      >
+      <span class="conn-label gemini-label" style="left: 700px; top: 285px"
+        >TEXT + IMAGE</span
+      >
+      <span class="conn-label gemini-label" style="left: 710px; top: 450px"
+        >AUDIO (PCM &rarr; WAV)</span
+      >
+      <span class="conn-label storage-label" style="left: 552px; top: 448px"
+        >JSON + PNG + WAV + ZIP</span
+      >
+
+      <!-- Browser Box -->
+      <div class="box browser">
+        <h3>Browser (Vue 3 SPA)</h3>
+        <div class="items">
+          <span class="highlight">Pinia</span> stores &middot;
+          <span class="highlight">Vite</span> dev server<br />
+          Glassmorphism UI + dynamic themes<br />
+          <br />
+          <strong style="color: #60a5fa">5-Step Wizard:</strong><br />
+          Upload &rarr; Story Direction &rarr;<br />
+          Generate &rarr; Preview &rarr; Download<br />
+          <br />
+          <strong style="color: #60a5fa">Input:</strong> PDF &middot; DOCX
+          &middot; MD &middot; TXT<br />
+          <strong style="color: #60a5fa">Output:</strong> SCORM 1.2 ZIP
+        </div>
+      </div>
+
+      <!-- Backend Box -->
+      <div class="box backend">
+        <h3>Express.js + TypeScript</h3>
+        <div class="items">
+          <strong style="color: #34d399">Routes:</strong><br />
+          POST /api/upload<br />
+          POST /api/suggest-directions<br />
+          POST /api/generate-course<br />
+          POST /api/generate-audio<br />
+          POST /api/build-scorm<br />
+          GET &nbsp;/api/download/:id/course.zip<br />
+          <br />
+          <strong style="color: #34d399">Services:</strong><br />
+          <span class="highlight">extractText</span> &middot;
+          <span class="highlight">courseGenerator</span><br />
+          <span class="highlight">ttsGenerator</span> &middot;
+          <span class="highlight">scormPackager</span><br />
+          wavEncoder &middot; promptBuilders
+        </div>
+        <span class="deploy-badge">TypeScript &middot; tsx hot-reload</span>
+      </div>
+
+      <!-- Storage Box -->
+      <div class="box storage">
+        <h3>Filesystem Storage</h3>
+        <div class="items">
+          <span class="highlight">output/{sessionId}/</span><br />
+          &nbsp;&nbsp;extracted.txt<br />
+          &nbsp;&nbsp;course.json
+          <span style="color: #94a3b8">(+ theme)</span><br />
+          &nbsp;&nbsp;course.zip
+          <span style="color: #94a3b8">(SCORM 1.2)</span><br />
+          &nbsp;&nbsp;assets/*.png
+          <span style="color: #94a3b8">(illustrations)</span><br />
+          &nbsp;&nbsp;assets/*.wav
+          <span style="color: #94a3b8">(narration)</span>
+        </div>
+        <span class="no-db-badge">No database &mdash; all state on disk</span>
+      </div>
+
+      <!-- Gemini: Story Suggestions -->
+      <div class="box gemini gemini-suggest">
+        <h3>Story Suggestions</h3>
+        <div class="items">
+          3 story direction proposals<br />
+          <span class="highlight">JSON structured output</span><br />
+          Title + description + tone<br />
+          Auto-retry on malformed JSON
+        </div>
+        <div class="model-tag">gemini-2.5-flash</div>
+      </div>
+
+      <!-- Gemini: Course + Illustrations -->
+      <div class="box gemini gemini-course">
+        <h3>Course + Illustrations</h3>
+        <div class="items">
+          Interleaved generation<br />
+          <span class="highlight">TEXT + IMAGE modalities</span><br />
+          [THEME] + [SCENE] + [QUIZ] parsing<br />
+          AI-generated color themes<br />
+          Visual style consistency enforced
+        </div>
+        <div class="model-tag">gemini-3.1-flash-image-preview</div>
+      </div>
+
+      <!-- Gemini: TTS Narration -->
+      <div class="box gemini gemini-tts">
+        <h3>Voice Narration</h3>
+        <div class="items">
+          Per-screen narration audio<br />
+          <span class="highlight">PCM 24kHz/16-bit</span> &rarr; WAV<br />
+          Graceful fallback on failure<br />
+          Text transcript as backup
+        </div>
+        <div class="model-tag">gemini-2.5-flash-preview-tts</div>
+      </div>
+    </div>
+
+    <!-- Data Pipeline -->
+    <div class="pipeline-section">
+      <div class="pipeline-title">End-to-End Data Pipeline</div>
+      <div class="pipeline">
+        <span class="pipe-step pipe-blue">Upload</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-green">Extract Text</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-purple">Suggest Directions</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-purple">Generate Course</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-purple">TTS Narration</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-yellow">SCORM Package</span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-line l-rest"></div>
+        REST API
+      </div>
+      <div class="legend-item">
+        <div class="legend-line l-gemini"></div>
+        Gemini SDK calls
+      </div>
+      <div class="legend-item">
+        <div class="legend-line l-storage"></div>
+        File I/O
+      </div>
+    </div>
+  </body>
+</html>

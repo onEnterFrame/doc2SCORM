@@ -111,7 +111,7 @@ function startOver() {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: rgba(27, 94, 47, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
   display: flex;
   align-items: center;
@@ -124,7 +124,7 @@ function startOver() {
   position: absolute;
   inset: -4px;
   border-radius: 50%;
-  border: 2px solid rgba(27, 94, 47, 0.25);
+  border: 2px solid color-mix(in srgb, var(--accent) 25%, transparent);
   animation: ringExpand 0.8s ease 0.3s both;
 }
 

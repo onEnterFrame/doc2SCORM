@@ -878,12 +878,12 @@ watch(currentIndex, () => {
 .btn-finish {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 10px rgba(27, 94, 47, 0.2);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .btn-next:hover,
 .btn-finish:hover {
-  box-shadow: 0 4px 16px rgba(27, 94, 47, 0.35);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .bar-center {
@@ -927,7 +927,7 @@ watch(currentIndex, () => {
 }
 
 .autoplay-toggle input:checked ~ .toggle-track {
-  background: rgba(27, 94, 47, 0.45);
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .toggle-thumb {
