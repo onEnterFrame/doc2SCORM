@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { useCourseStore } from "../stores/courseStore";
 
+import { ref } from "vue";
+
 const store = useCourseStore();
+const publishError = ref("");
+const copySuccess = ref(false);
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return bytes + " B";
@@ -15,6 +19,26 @@ function download() {
 
 function startOver() {
   store.reset();
+}
+
+async function publish() {
+  publishError.value = "";
+  try {
+    await store.publishCourse();
+  } catch (error) {
+    publishError.value =
+      error instanceof Error ? error.message : "Publish failed";
+  }
+}
+
+async function copyUrl() {
+  try {
+    await navigator.clipboard.writeText(store.publicUrl);
+    copySuccess.value = true;
+    setTimeout(() => (copySuccess.value = false), 2000);
+  } catch {
+    // fallback: select the input text
+  }
 }
 </script>
 
@@ -82,6 +106,67 @@ function startOver() {
       <p class="scorm-note">
         Upload this ZIP file to your LMS (Moodle, SCORM Cloud, etc.) to deploy the course.
       </p>
+
+      <div class="publish-divider"></div>
+
+      <div class="publish-section">
+        <h3 class="publish-heading">Share Your Course</h3>
+
+        <template v-if="!store.isPublished">
+          <p class="publish-description">
+            Publish to the public gallery so anyone can experience your course — no LMS required.
+          </p>
+          <button
+            class="btn btn-primary"
+            :disabled="store.isPublishing"
+            @click="publish"
+          >
+            <svg v-if="!store.isPublishing" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <svg v-else class="spinner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            {{ store.isPublishing ? "Publishing..." : "Make Public" }}
+          </button>
+          <p v-if="publishError" class="publish-error">{{ publishError }}</p>
+        </template>
+
+        <template v-else>
+          <div class="publish-success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Published to the gallery</span>
+          </div>
+          <div class="publish-url-row">
+            <input
+              type="text"
+              class="publish-url-input"
+              :value="store.publicUrl"
+              readonly
+              @focus="($event.target as HTMLInputElement).select()"
+            />
+            <button class="btn btn-secondary btn-copy" @click="copyUrl">
+              {{ copySuccess ? "Copied!" : "Copy" }}
+            </button>
+          </div>
+          <a
+            :href="store.publicUrl"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-ghost open-link"
+          >
+            Open Published Course
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -207,5 +292,89 @@ function startOver() {
 .scorm-note {
   color: var(--text-on-glass-secondary);
   font-size: 0.8em;
+}
+
+.publish-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 28px 0;
+}
+
+.publish-section {
+  text-align: center;
+}
+
+.publish-heading {
+  font-family: var(--font-display);
+  color: var(--text-on-glass);
+  font-size: 1.15em;
+  margin-bottom: 12px;
+}
+
+.publish-description {
+  color: var(--text-on-glass-secondary);
+  font-size: 0.88em;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.publish-error {
+  color: var(--red);
+  font-size: 0.85em;
+  margin-top: 10px;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.publish-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.publish-url-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.publish-url-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-on-glass);
+  font-family: monospace;
+  font-size: 0.78em;
+  outline: none;
+}
+
+.publish-url-input:focus {
+  border-color: var(--accent);
+}
+
+.btn-copy {
+  padding: 10px 18px;
+  white-space: nowrap;
+}
+
+.open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-size: 0.9em;
 }
 </style>

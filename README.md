@@ -2,7 +2,9 @@
 
 ### Gemini Live Agent Challenge — Creative Storyteller Category
 
-> **An AI Creative Director that transforms static documents into immersive, story-driven eLearning courses** — with interleaved illustrations, adaptive color themes, professional narration, interactive decision points, and quizzes — all from a single multimodal Gemini generation.
+> **An AI Creative Director that transforms static documents into immersive, story-driven eLearning courses** — with interleaved illustrations, adaptive color themes, professional narration, interactive decision points, quizzes, and a **public gallery** for sharing — all from a single multimodal Gemini generation.
+>
+> **Live app:** [https://doc2scorm-backend-[YOUR_HASH]-uc.a.run.app](https://doc2scorm-backend-[YOUR_HASH]-uc.a.run.app) *(update after deploy)*
 
 ---
 
@@ -12,7 +14,7 @@ Corporate training is broken. Subject matter experts write dense documents — c
 
 Converting these documents into engaging eLearning courses currently requires a team of instructional designers, graphic artists, voice actors, and LMS developers. It takes weeks and costs thousands of dollars per course.
 
-**Doc2SCORM Director solves this in under 2 minutes.** Upload a document, pick a narrative direction, and an AI Creative Director generates a complete, deployable course — with original illustrations, professional narration, interactive scenarios, and a beautiful adaptive UI — all packaged as a SCORM 1.2 ZIP ready for any Learning Management System.
+**Doc2SCORM Director solves this in under 2 minutes.** Upload a document, pick a narrative direction, and an AI Creative Director generates a complete, deployable course — with original illustrations, professional narration, interactive scenarios, and a beautiful adaptive UI — all packaged as a SCORM 1.2 ZIP ready for any Learning Management System. You can also **publish to a public gallery** and share a direct link — no LMS required.
 
 ---
 
@@ -33,22 +35,23 @@ Converting these documents into engaging eLearning courses currently requires a 
 ┌─────────────────┐                       ┌─────────────────────┐                          ┌──────────────────────┐
 │   Vue 3 SPA     │       REST API        │  Express + TS       │    generateContent       │  Story Suggestions   │
 │                 │ ─────────────────────▸ │                     │ ─────── (JSON) ─────────▸│  gemini-2.5-flash    │
-│  5-Step Wizard  │                        │  6 REST endpoints   │                          └──────────────────────┘
-│  Glassmorphism  │                        │                     │                          ┌──────────────────────┐
-│  Dynamic Themes │ ◂──── SCORM ZIP ───── │  Text extraction    │ ── (TEXT + IMAGE) ──────▸│  Course + Images     │
-│  @property CSS  │                        │  Course generation  │                          │  gemini-3.1-flash-   │
+│  5-Step Wizard  │                        │  8 REST endpoints   │                          └──────────────────────┘
+│  + Gallery View │                        │                     │                          ┌──────────────────────┐
+│  Glassmorphism  │ ◂──── SCORM ZIP ───── │  Text extraction    │ ── (TEXT + IMAGE) ──────▸│  Course + Images     │
+│  Dynamic Themes │                        │  Course generation  │                          │  gemini-3.1-flash-   │
 │  Audio player   │                        │  TTS encoding       │                          │  image-preview       │
 │                 │                        │  SCORM packaging    │                          └──────────────────────┘
-│  Pinia · Vite   │                        │                     │                          ┌──────────────────────┐
+│  Pinia · Vite   │                        │  GCS publishing     │                          ┌──────────────────────┐
 │                 │                        │  Google GenAI SDK   │ ─── (AUDIO PCM→WAV) ───▸│  Voice Narration     │
-└─────────────────┘                        └────────┬────────────┘                          │  gemini-2.5-flash-   │
-                                                    │ File I/O                              │  preview-tts         │
-                                           ┌────────▼────────────┐                          └──────────────────────┘
-                                           │  Filesystem Storage  │
-                                           │  output/{sessionId}/ │
-                                           │  course.json · *.png │
-                                           │  *.wav · course.zip  │
-                                           └──────────────────────┘
+└─────────────────┘                        └───┬────────────┬────┘                          │  gemini-2.5-flash-   │
+                                               │ File I/O   │ GCS Upload                   │  preview-tts         │
+                                    ┌──────────▼──────┐  ┌──▼─────────────────┐            └──────────────────────┘
+                                    │ Filesystem      │  │ Google Cloud       │
+                                    │ output/{session} │  │ Storage (GCS)      │
+                                    │ course.json ·   │  │ gallery.json       │
+                                    │ *.png · *.wav   │  │ courses/{id}/      │
+                                    │ course.zip      │  │ (public static)    │
+                                    └─────────────────┘  └────────────────────┘
 ```
 
 ---
@@ -65,6 +68,7 @@ This project isn't a chatbot. It's an **autonomous creative agent** that thinks 
 | **Hear** | Professional per-screen narration with custom audio player and transcript toggle | TTS via `gemini-2.5-flash-preview-tts`, PCM-to-WAV encoding |
 | **Interact** | Decision points with branching consequences, reflection prompts, scored quizzes | Structured generation with `[SCENE]`/`[QUIZ]` parsing |
 | **Adapt** | The entire UI shifts color palette to match course content (navy for cybersecurity, amber for cooking, etc.) | AI-selected `[THEME]` block with 5 CSS color tokens |
+| **Share** | One-click publish to a public gallery with shareable GCS-hosted link — no LMS required | Google Cloud Storage static hosting + standalone player |
 
 ### The Interleaved Output — Our Core Innovation
 
@@ -154,6 +158,15 @@ The entire course is packaged as a standards-compliant SCORM 1.2 ZIP including:
 
 Upload the ZIP to **any** LMS — Moodle, SCORM Cloud, Blackboard, Canvas, TalentLMS, etc.
 
+### 6. Public Gallery & Shareable Links
+
+After generating a course, click **"Make Public"** to publish it to a browsable gallery. Published courses are uploaded as static files to **Google Cloud Storage**, so they load fast and require zero backend to view. Each course gets a shareable URL that opens a standalone player — the existing SCORM `runtime.js` already handles the no-LMS case gracefully (`findAPI()` returns null and all SCORM methods silently no-op).
+
+- **Gallery view** — Toggle between the creator wizard and a gallery of all published courses
+- **One-click publish** — Uploads `index.html`, `runtime.js`, `course.json`, and all assets to GCS
+- **Shareable link** — Copy the public URL to share with anyone — no authentication needed
+- **GCS bucket structure** — `gallery.json` index + per-course directories under `courses/{publishId}/`
+
 ---
 
 ## Error Handling & Robustness
@@ -171,22 +184,64 @@ Upload the ZIP to **any** LMS — Moodle, SCORM Cloud, Blackboard, Canvas, Talen
 
 ## Google Cloud Deployment
 
-<!-- TODO: Update with actual deployment details -->
+The app runs as a **single Cloud Run container** (Express serves both API and Vue SPA) with a **GCS bucket** for the public gallery. One deploy script sets up everything.
 
-The backend is deployed on **Google Cloud Run** as a containerized service.
+### Quick Deploy
 
 ```bash
-# Build and deploy to Cloud Run
-gcloud run deploy doc2scorm-backend \
-  --source ./backend \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=$GEMINI_API_KEY \
-  --memory 1Gi \
-  --timeout 300
+# Set your credentials
+export GCP_PROJECT_ID=your-gcp-project
+export GEMINI_API_KEY=your-api-key
+# Optional: custom bucket name (default: doc2scorm-gallery)
+export GCS_GALLERY_BUCKET=doc2scorm-gallery
+
+# Deploy (creates GCS bucket + builds via Cloud Build + deploys to Cloud Run)
+./deploy.sh
 ```
 
-The frontend is deployed as a static site on **Firebase Hosting** (or Cloud Storage + Cloud CDN), proxying API requests to the Cloud Run backend.
+The deploy script will:
+1. Create the GCS gallery bucket (if it doesn't exist) with public read access
+2. Build the Docker image via Cloud Build
+3. Deploy to Cloud Run with all required env vars (`GEMINI_API_KEY`, `GCS_GALLERY_BUCKET`)
+
+### Manual Deploy
+
+```bash
+# 1. Create the GCS bucket for the public gallery
+GALLERY_BUCKET="doc2scorm-gallery"
+gcloud storage buckets create "gs://${GALLERY_BUCKET}" \
+  --project $GCP_PROJECT_ID \
+  --location us-central1 \
+  --uniform-bucket-level-access
+gcloud storage buckets add-iam-policy-binding "gs://${GALLERY_BUCKET}" \
+  --member="allUsers" \
+  --role="roles/storage.objectViewer"
+
+# 2. Deploy the Cloud Run service
+gcloud run deploy doc2scorm-backend \
+  --project $GCP_PROJECT_ID \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --memory 1Gi \
+  --timeout 300 \
+  --set-env-vars "GEMINI_API_KEY=$GEMINI_API_KEY,GCS_GALLERY_BUCKET=$GALLERY_BUCKET"
+```
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `GEMINI_API_KEY` | Yes | — | Google AI API key for Gemini models |
+| `GCS_GALLERY_BUCKET` | No | `doc2scorm-gallery` | GCS bucket name for the public gallery |
+| `PORT` | No | `3456` (dev) / `8080` (prod) | Server port (Cloud Run sets this automatically) |
+
+### How It Works
+
+The multi-stage `Dockerfile` builds the Vue frontend, compiles the TypeScript backend, and produces a slim Node 22 Alpine image. In production, Express serves the SPA static files and catches all non-API routes with a fallback to `index.html`. The GCS gallery bucket is created with uniform bucket-level access and a public `objectViewer` binding so published courses are accessible to anyone.
+
+On Cloud Run, GCS authentication is automatic via the service account — no credentials file needed. Locally, use `gcloud auth application-default login`.
 
 > See the [Cloud Deployment Proof video](PLACEHOLDER) for a screen recording of the backend running on Google Cloud.
 
@@ -238,13 +293,14 @@ cd frontend && npm run build
 |-------|-----------|---------|
 | **AI** | Google GenAI SDK (`@google/genai`) | All Gemini model interactions |
 | **Backend** | Express.js 5 + TypeScript (ESM) | REST API, generation orchestration |
-| **Frontend** | Vue 3 + Pinia + Vite | 5-step wizard UI with reactive state |
+| **Frontend** | Vue 3 + Pinia + Vite | 5-step wizard + gallery UI with reactive state |
 | **Text Extraction** | `pdf-parse`, `mammoth`, `marked` | PDF, DOCX, Markdown, TXT support |
 | **Audio** | Custom `wavEncoder.ts` | PCM 24kHz/16-bit → WAV encoding |
 | **Packaging** | `archiver` | SCORM 1.2 ZIP assembly |
 | **SCORM Runtime** | Vanilla JS (`runtime.js`) | LMS API discovery, player, quiz scoring |
+| **Gallery** | `@google-cloud/storage` | GCS upload, gallery.json management |
 | **Styling** | Glassmorphism CSS + `@property` | Dynamic theming with smooth transitions |
-| **Cloud** | Google Cloud Run | Backend hosting |
+| **Cloud** | Google Cloud Run + Cloud Storage | Backend hosting + public gallery CDN |
 
 ---
 
@@ -259,6 +315,8 @@ cd frontend && npm run build
 | `POST` | `/api/generate-audio` | Generate TTS narration for all screens |
 | `POST` | `/api/build-scorm` | Package everything into SCORM 1.2 ZIP |
 | `GET`  | `/api/download/:sessionId/course.zip` | Download the SCORM package |
+| `POST` | `/api/publish` | Publish course to GCS public gallery, return shareable URL |
+| `GET`  | `/api/gallery` | Fetch all published courses from the gallery |
 
 ---
 
@@ -268,34 +326,43 @@ cd frontend && npm run build
 doc2story/
 ├── backend/src/
 │   ├── index.ts                    # Express server, route registration
-│   ├── routes/                     # 5 REST endpoints (upload → scorm)
+│   ├── routes/
+│   │   ├── upload.ts               # POST /api/upload
+│   │   ├── suggest.ts              # POST /api/suggest-directions
+│   │   ├── generate.ts             # POST /api/generate-course, GET /api/course/:id
+│   │   ├── audio.ts                # POST /api/generate-audio
+│   │   ├── scorm.ts                # POST /api/build-scorm, GET /api/download
+│   │   └── publish.ts              # POST /api/publish, GET /api/gallery
 │   ├── services/
 │   │   ├── gemini.ts               # GenAI SDK client singleton
 │   │   ├── extractText.ts          # PDF/DOCX/MD/TXT extraction
 │   │   ├── courseGenerator.ts       # Interleaved generation + response parsing
 │   │   ├── ttsGenerator.ts         # Per-screen TTS + WAV encoding
-│   │   └── scormPackager.ts        # ZIP assembly with manifest
+│   │   ├── scormPackager.ts        # ZIP assembly with manifest
+│   │   └── gcsPublisher.ts         # GCS upload + gallery.json management
 │   ├── prompts/
 │   │   ├── suggestDirections.ts    # Suggestion prompt (JSON output)
 │   │   └── generateCourse.ts       # Course prompt ([THEME]/[SCENE]/[QUIZ])
 │   ├── templates/
 │   │   ├── imsmanifest.xml         # SCORM manifest template
-│   │   ├── index.html              # Glassmorphism SCORM player
+│   │   ├── index.html              # Glassmorphism SCORM player (also used for GCS)
 │   │   └── runtime.js              # SCORM API + renderer + theme application
-│   ├── types/course.ts             # CourseTheme, Course, Module, Screen, Quiz
+│   ├── types/course.ts             # CourseTheme, Course, Module, Screen, Quiz, GalleryEntry
 │   └── utils/wavEncoder.ts         # PCM → WAV header encoder
 ├── frontend/src/
-│   ├── App.vue                     # Root layout, @property CSS registrations
-│   ├── stores/courseStore.ts        # Pinia state + applyTheme/resetTheme
+│   ├── App.vue                     # Root layout, gallery toggle, @property CSS
+│   ├── stores/courseStore.ts        # Pinia state + publish actions
 │   ├── components/
 │   │   ├── FileUpload.vue          # Drag-drop upload
 │   │   ├── StoryPicker.vue         # 3 direction cards
 │   │   ├── GenerationProgress.vue   # Stage progress + theme trigger
 │   │   ├── CoursePreview.vue        # Full slide player + audio + interactions
-│   │   └── ScormDownload.vue        # Download stats + start over
-│   └── types/course.ts             # Frontend type definitions
+│   │   ├── ScormDownload.vue        # Download stats + publish to gallery
+│   │   └── GalleryView.vue         # Public gallery with course cards
+│   └── types/course.ts             # Frontend type definitions (incl. GalleryEntry)
 ├── architecture.html               # Interactive architecture diagram
-├── Dockerfile                      # Cloud Run container
+├── deploy.sh                       # Cloud Run + GCS bucket deployment
+├── Dockerfile                      # Cloud Run container (Node 22 Alpine)
 ├── package.json                    # Monorepo (concurrently)
 └── .env                            # GEMINI_API_KEY (not committed)
 ```
@@ -308,7 +375,7 @@ doc2story/
 |---|---|---|
 | Leverages a Gemini model | **3 models** | `gemini-2.5-flash`, `gemini-3.1-flash-image-preview`, `gemini-2.5-flash-preview-tts` |
 | Built with Google GenAI SDK | Yes | `@google/genai` — see `backend/src/services/gemini.ts` |
-| Uses Google Cloud service | Yes | Backend deployed on Cloud Run |
+| Uses Google Cloud service | **2 services** | Cloud Run (backend) + Cloud Storage (public gallery) |
 | Interleaved/mixed output | Yes | `responseModalities: [TEXT, IMAGE]` — core of course generation |
 | Text description | Yes | This README |
 | Public code repository | Yes | This repository |

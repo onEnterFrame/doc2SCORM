@@ -5,6 +5,8 @@ import StoryPicker from "./components/StoryPicker.vue";
 import GenerationProgress from "./components/GenerationProgress.vue";
 import CoursePreview from "./components/CoursePreview.vue";
 import ScormDownload from "./components/ScormDownload.vue";
+import GalleryView from "./components/GalleryView.vue";
+import AboutPage from "./components/AboutPage.vue";
 
 const store = useCourseStore();
 
@@ -25,37 +27,77 @@ const steps = [
     <div class="bg-orb bg-orb-3"></div>
 
     <header class="header">
-      <h1 class="logo">Doc2SCORM <span class="logo-accent">Director</span></h1>
-      <p class="subtitle">AI Creative Director for Story-Driven Learning</p>
+      <div class="header-row">
+        <div>
+          <h1 class="logo">Doc2SCORM <span class="logo-accent">Director</span></h1>
+          <p class="subtitle">AI Creative Director for Story-Driven Learning</p>
+        </div>
+        <div class="header-pills">
+          <button
+            class="gallery-pill"
+            @click="store.view = store.view === 'gallery' ? 'wizard' : 'gallery'"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            {{ store.view === 'gallery' ? 'Creator' : 'Gallery' }}
+          </button>
+          <button
+            class="gallery-pill"
+            @click="store.view = store.view === 'about' ? 'wizard' : 'about'"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            {{ store.view === 'about' ? 'Creator' : 'About' }}
+          </button>
+        </div>
+      </div>
     </header>
 
-    <nav class="steps">
-      <div
-        v-for="step in steps"
-        :key="step.num"
-        class="step"
-        :class="{
-          active: store.currentStep === step.num,
-          completed: store.currentStep > step.num,
-        }"
-      >
-        <div class="step-dot">
-          <span v-if="store.currentStep > step.num">&#10003;</span>
-          <span v-else>{{ step.num }}</span>
-        </div>
-        <span class="step-label">{{ step.label }}</span>
-      </div>
-    </nav>
+    <template v-if="store.view === 'gallery'">
+      <main class="main">
+        <GalleryView />
+      </main>
+    </template>
 
-    <main class="main">
-      <Transition name="page" mode="out-in">
-        <FileUpload v-if="store.currentStep === 1" key="upload" />
-        <StoryPicker v-else-if="store.currentStep === 2" key="picker" />
-        <GenerationProgress v-else-if="store.currentStep === 3" key="progress" />
-        <CoursePreview v-else-if="store.currentStep === 4" key="preview" />
-        <ScormDownload v-else-if="store.currentStep === 5" key="download" />
-      </Transition>
-    </main>
+    <template v-else-if="store.view === 'about'">
+      <main class="main">
+        <AboutPage />
+      </main>
+    </template>
+
+    <template v-else>
+      <nav class="steps">
+        <div
+          v-for="step in steps"
+          :key="step.num"
+          class="step"
+          :class="{
+            active: store.currentStep === step.num,
+            completed: store.currentStep > step.num,
+          }"
+        >
+          <div class="step-dot">
+            <span v-if="store.currentStep > step.num">&#10003;</span>
+            <span v-else>{{ step.num }}</span>
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+      </nav>
+
+      <main class="main">
+        <Transition name="page" mode="out-in">
+          <FileUpload v-if="store.currentStep === 1" key="upload" />
+          <StoryPicker v-else-if="store.currentStep === 2" key="picker" />
+          <GenerationProgress v-else-if="store.currentStep === 3" key="progress" />
+          <CoursePreview v-else-if="store.currentStep === 4" key="preview" />
+          <ScormDownload v-else-if="store.currentStep === 5" key="download" />
+        </Transition>
+      </main>
+    </template>
 
     <footer class="footer">
       <p>Powered by Gemini &middot; Story-Driven Learning</p>
@@ -224,6 +266,46 @@ body {
   text-align: center;
   margin-bottom: 32px;
   animation: fadeDown 0.6s ease;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+}
+
+.header-pills {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gallery-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-body);
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gallery-pill:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
 }
 
 .logo {

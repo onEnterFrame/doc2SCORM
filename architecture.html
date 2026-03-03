@@ -42,7 +42,7 @@
       .diagram {
         position: relative;
         width: 1100px;
-        height: 740px;
+        height: 820px;
       }
 
       /* --- Boxes --- */
@@ -103,12 +103,24 @@
       .box.storage {
         background: rgba(245, 158, 11, 0.08);
         border-color: rgba(245, 158, 11, 0.3);
-        left: 410px;
+        left: 310px;
         top: 500px;
-        width: 260px;
+        width: 230px;
       }
       .box.storage h3 {
         color: #fbbf24;
+      }
+
+      /* GCS */
+      .box.gcs {
+        background: rgba(56, 189, 248, 0.08);
+        border-color: rgba(56, 189, 248, 0.3);
+        left: 560px;
+        top: 500px;
+        width: 230px;
+      }
+      .box.gcs h3 {
+        color: #38bdf8;
       }
 
       /* Gemini Models */
@@ -171,6 +183,10 @@
         stroke: #fbbf24;
         stroke-dasharray: 4 4;
       }
+      .conn.gcs-call {
+        stroke: #38bdf8;
+        stroke-dasharray: 6 4;
+      }
 
       /* --- Labels on connections --- */
       .conn-label {
@@ -196,6 +212,11 @@
         background: rgba(245, 158, 11, 0.12);
         color: #fbbf24;
         border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+      .conn-label.gcs-label {
+        background: rgba(56, 189, 248, 0.12);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.2);
       }
 
       /* --- Legend --- */
@@ -228,6 +249,10 @@
       }
       .legend-line.l-storage {
         background: #fbbf24;
+        opacity: 0.7;
+      }
+      .legend-line.l-gcs {
+        background: #38bdf8;
         opacity: 0.7;
       }
 
@@ -305,6 +330,11 @@
         color: #fbbf24;
         border: 1px solid rgba(245, 158, 11, 0.25);
       }
+      .pipe-gcs {
+        background: rgba(56, 189, 248, 0.12);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+      }
 
       .no-db-badge {
         display: inline-block;
@@ -336,7 +366,7 @@
       >
 
       <!-- SVG Connections -->
-      <svg class="connections" viewBox="0 0 1100 740">
+      <svg class="connections" viewBox="0 0 1100 820">
         <defs>
           <marker
             id="arrow-green"
@@ -374,6 +404,18 @@
           >
             <path d="M 0 0 L 10 5 L 0 10 z" />
           </marker>
+          <marker
+            id="arrow-blue"
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto"
+            fill="#38bdf8"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
         </defs>
 
         <!-- Browser -> Backend (REST) -->
@@ -407,8 +449,15 @@
         <!-- Backend -> Storage -->
         <path
           class="conn storage-call"
-          d="M 540 420 L 540 500"
+          d="M 480 420 L 430 500"
           marker-end="url(#arrow-yellow)"
+        />
+
+        <!-- Backend -> GCS -->
+        <path
+          class="conn gcs-call"
+          d="M 580 420 L 660 500"
+          marker-end="url(#arrow-blue)"
         />
       </svg>
 
@@ -425,8 +474,11 @@
       <span class="conn-label gemini-label" style="left: 710px; top: 450px"
         >AUDIO (PCM &rarr; WAV)</span
       >
-      <span class="conn-label storage-label" style="left: 552px; top: 448px"
+      <span class="conn-label storage-label" style="left: 350px; top: 448px"
         >JSON + PNG + WAV + ZIP</span
+      >
+      <span class="conn-label gcs-label" style="left: 600px; top: 448px"
+        >Publish to Gallery</span
       >
 
       <!-- Browser Box -->
@@ -441,9 +493,12 @@
           Upload &rarr; Story Direction &rarr;<br />
           Generate &rarr; Preview &rarr; Download<br />
           <br />
+          <strong style="color: #60a5fa">Gallery View:</strong><br />
+          Browse &middot; Publish &middot; Share<br />
+          <br />
           <strong style="color: #60a5fa">Input:</strong> PDF &middot; DOCX
           &middot; MD &middot; TXT<br />
-          <strong style="color: #60a5fa">Output:</strong> SCORM 1.2 ZIP
+          <strong style="color: #60a5fa">Output:</strong> SCORM ZIP &middot; Public URL
         </div>
       </div>
 
@@ -457,14 +512,16 @@
           POST /api/generate-course<br />
           POST /api/generate-audio<br />
           POST /api/build-scorm<br />
-          GET &nbsp;/api/download/:id/course.zip<br />
+          POST /api/publish<br />
+          GET &nbsp;/api/gallery<br />
           <br />
           <strong style="color: #34d399">Services:</strong><br />
           <span class="highlight">extractText</span> &middot;
           <span class="highlight">courseGenerator</span><br />
           <span class="highlight">ttsGenerator</span> &middot;
           <span class="highlight">scormPackager</span><br />
-          wavEncoder &middot; promptBuilders
+          <span class="highlight">gcsPublisher</span> &middot;
+          wavEncoder
         </div>
         <span class="deploy-badge">TypeScript &middot; tsx hot-reload</span>
       </div>
@@ -485,6 +542,22 @@
           <span style="color: #94a3b8">(narration)</span>
         </div>
         <span class="no-db-badge">No database &mdash; all state on disk</span>
+      </div>
+
+      <!-- GCS Box -->
+      <div class="box gcs">
+        <h3>Google Cloud Storage</h3>
+        <div class="items">
+          <span class="highlight">gs://doc2scorm-gallery/</span><br />
+          &nbsp;&nbsp;gallery.json
+          <span style="color: #94a3b8">(index)</span><br />
+          &nbsp;&nbsp;courses/{publishId}/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;index.html
+          <span style="color: #94a3b8">(player)</span><br />
+          &nbsp;&nbsp;&nbsp;&nbsp;js/runtime.js<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;course.json + assets/*
+        </div>
+        <span class="no-db-badge">Public static &mdash; no backend needed</span>
       </div>
 
       <!-- Gemini: Story Suggestions -->
@@ -540,6 +613,8 @@
         <span class="pipe-step pipe-purple">TTS Narration</span>
         <span class="pipe-arrow">&rarr;</span>
         <span class="pipe-step pipe-yellow">SCORM Package</span>
+        <span class="pipe-arrow">&rarr;</span>
+        <span class="pipe-step pipe-gcs">Publish to Gallery</span>
       </div>
     </div>
 
@@ -556,6 +631,10 @@
       <div class="legend-item">
         <div class="legend-line l-storage"></div>
         File I/O
+      </div>
+      <div class="legend-item">
+        <div class="legend-line l-gcs"></div>
+        GCS Upload
       </div>
     </div>
   </body>

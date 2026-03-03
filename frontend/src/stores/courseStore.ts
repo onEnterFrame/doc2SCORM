@@ -38,6 +38,12 @@ export const useCourseStore = defineStore("course", {
     scormReady: false,
     downloadUrl: "",
     scormSizeBytes: 0,
+    // Publish
+    isPublishing: false,
+    isPublished: false,
+    publicUrl: "",
+    // View
+    view: "wizard" as "wizard" | "gallery" | "about",
     // Error
     errorMessage: "",
   }),
@@ -78,7 +84,32 @@ export const useCourseStore = defineStore("course", {
       this.scormReady = false;
       this.downloadUrl = "";
       this.scormSizeBytes = 0;
+      this.isPublishing = false;
+      this.isPublished = false;
+      this.publicUrl = "";
       this.errorMessage = "";
+    },
+    async publishCourse() {
+      if (!this.sessionId) return;
+      this.isPublishing = true;
+      try {
+        const res = await fetch("/api/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: this.sessionId }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || "Publish failed");
+        }
+        const data = await res.json();
+        this.publicUrl = data.url;
+        this.isPublished = true;
+      } catch (error) {
+        throw error;
+      } finally {
+        this.isPublishing = false;
+      }
     },
   },
 });

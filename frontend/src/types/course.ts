@@ -50,6 +50,18 @@ export interface QuizQuestion {
   answerIndex: number;
 }
 
+export interface GalleryEntry {
+  id: string;
+  title: string;
+  description: string;
+  theme?: CourseTheme;
+  thumbnail: string | null;
+  moduleCount: number;
+  screenCount: number;
+  publishedAt: string;
+  url: string;
+}
+
 export interface StorySuggestion {
   id: string;
   title: string;
