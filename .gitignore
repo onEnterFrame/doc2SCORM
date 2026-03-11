@@ -1,8 +1,9 @@
 node_modules
 dist
 .env
-*.jpg
-*.png
+# Exclude generated images in output, but allow Sample images/
+backend/output/**/*.png
+backend/output/**/*.jpg
 
 CLAUDE.md
 

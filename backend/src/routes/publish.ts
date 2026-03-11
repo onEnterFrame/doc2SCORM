@@ -4,6 +4,7 @@ import { readFile } from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
 import { publishCourse, getGallery } from "../services/gcsPublisher.js";
 import type { Course } from "../types/course.js";
+import { validateSessionId } from "../utils/validateSessionId.js";
 
 const router = Router();
 
@@ -13,6 +14,11 @@ router.post("/api/publish", async (req, res) => {
 
     if (!sessionId) {
       res.status(400).json({ error: "sessionId is required" });
+      return;
+    }
+
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
       return;
     }
 

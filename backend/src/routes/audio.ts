@@ -1,6 +1,7 @@
 import { Router } from "express";
 import path from "path";
 import { generateAllAudio } from "../services/ttsGenerator.js";
+import { validateSessionId } from "../utils/validateSessionId.js";
 
 const router = Router();
 
@@ -10,6 +11,11 @@ router.post("/api/generate-audio", async (req, res) => {
 
     if (!sessionId) {
       res.status(400).json({ error: "sessionId is required" });
+      return;
+    }
+
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
       return;
     }
 

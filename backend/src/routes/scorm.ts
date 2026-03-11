@@ -3,6 +3,7 @@ import path from "path";
 import { readFile, writeFile } from "fs/promises";
 import { buildScormPackage } from "../services/scormPackager.js";
 import type { Course } from "../types/course.js";
+import { validateSessionId } from "../utils/validateSessionId.js";
 
 const router = Router();
 
@@ -12,6 +13,11 @@ router.post("/api/build-scorm", async (req, res) => {
 
     if (!sessionId) {
       res.status(400).json({ error: "sessionId is required" });
+      return;
+    }
+
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
       return;
     }
 
@@ -46,6 +52,10 @@ router.post("/api/build-scorm", async (req, res) => {
 router.get("/api/download/:sessionId/course.zip", async (req, res) => {
   try {
     const { sessionId } = req.params;
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
+      return;
+    }
     const zipPath = path.join(
       import.meta.dirname,
       "../../output",

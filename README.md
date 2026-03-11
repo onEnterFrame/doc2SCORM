@@ -258,7 +258,7 @@ On Cloud Run, GCS authentication is automatic via the service account — no cre
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/doc2story.git
+git clone https://github.com/onEnterFrame/doc2story.git
 cd doc2story
 
 # 2. Install all dependencies

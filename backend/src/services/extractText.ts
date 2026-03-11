@@ -20,11 +20,8 @@ export async function extractText(
     }
     case "text/markdown": {
       const md = buffer.toString("utf-8");
-      const tokens = marked.lexer(md);
-      return tokens
-        .map((t) => ("text" in t ? (t as { text: string }).text : ""))
-        .filter(Boolean)
-        .join("\n");
+      const html = await marked.parse(md);
+      return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
     }
     case "text/plain":
     default:

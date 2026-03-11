@@ -1,6 +1,17 @@
 import { defineStore } from "pinia";
 import type { Course, CourseTheme, StorySuggestion } from "../types/course";
 
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const RGBA_RE = /^rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[\d.]+\)$/;
+
+function isValidHex(v: string): boolean {
+  return HEX_RE.test(v);
+}
+
+function isValidCssColor(v: string): boolean {
+  return isValidHex(v) || RGBA_RE.test(v);
+}
+
 function hexToRgba(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.substring(0, 2), 16);
@@ -50,14 +61,22 @@ export const useCourseStore = defineStore("course", {
   actions: {
     applyTheme(theme: CourseTheme) {
       const root = document.documentElement;
-      root.style.setProperty("--gradient-start", theme.gradientStart);
-      root.style.setProperty("--gradient-end", theme.gradientEnd);
-      root.style.setProperty("--accent", theme.accent);
-      root.style.setProperty("--text-on-glass", theme.textOnGlass);
-      root.style.setProperty("--text-on-glass-secondary", theme.textOnGlassSecondary);
-      root.style.setProperty("--orb-1", hexToRgba(theme.gradientEnd, 0.4));
-      root.style.setProperty("--orb-2", hexToRgba(theme.accent, 0.25));
-      root.style.setProperty("--orb-3", hexToRgba(theme.gradientStart, 0.3));
+      if (isValidHex(theme.gradientStart))
+        root.style.setProperty("--gradient-start", theme.gradientStart);
+      if (isValidHex(theme.gradientEnd))
+        root.style.setProperty("--gradient-end", theme.gradientEnd);
+      if (isValidHex(theme.accent))
+        root.style.setProperty("--accent", theme.accent);
+      if (isValidHex(theme.textOnGlass))
+        root.style.setProperty("--text-on-glass", theme.textOnGlass);
+      if (isValidCssColor(theme.textOnGlassSecondary))
+        root.style.setProperty("--text-on-glass-secondary", theme.textOnGlassSecondary);
+      if (isValidHex(theme.gradientEnd))
+        root.style.setProperty("--orb-1", hexToRgba(theme.gradientEnd, 0.4));
+      if (isValidHex(theme.accent))
+        root.style.setProperty("--orb-2", hexToRgba(theme.accent, 0.25));
+      if (isValidHex(theme.gradientStart))
+        root.style.setProperty("--orb-3", hexToRgba(theme.gradientStart, 0.3));
     },
     resetTheme() {
       const root = document.documentElement;

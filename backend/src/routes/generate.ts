@@ -2,12 +2,17 @@ import { Router } from "express";
 import path from "path";
 import { readFile } from "fs/promises";
 import { generateCourse } from "../services/courseGenerator.js";
+import { validateSessionId } from "../utils/validateSessionId.js";
 
 const router = Router();
 
 router.get("/api/course/:sessionId", async (req, res) => {
   try {
     const { sessionId } = req.params;
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
+      return;
+    }
     const sessionDir = path.join(
       import.meta.dirname,
       "../../output",
@@ -31,6 +36,11 @@ router.post("/api/generate-course", async (req, res) => {
       res
         .status(400)
         .json({ error: "sessionId, extractedText, and direction are required" });
+      return;
+    }
+
+    if (!validateSessionId(sessionId)) {
+      res.status(400).json({ error: "Invalid sessionId" });
       return;
     }
 

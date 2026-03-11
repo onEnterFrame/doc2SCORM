@@ -44,6 +44,10 @@ async function handleFile(file: File) {
   }
 
   error.value = "";
+  store.selectedDirection = null;
+  store.courseData = null;
+  store.generationStatus = "idle";
+  store.scormReady = false;
   isUploading.value = true;
   store.fileName = file.name;
 

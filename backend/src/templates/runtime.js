@@ -184,12 +184,15 @@
       // Apply theme if present
       if (course.theme) {
         var t = course.theme;
+        var hexRe = /^#[0-9a-fA-F]{6}$/;
+        var rgbaRe = /^rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[\d.]+\)$/;
         var root = document.documentElement.style;
-        root.setProperty("--gradient-start", t.gradientStart);
-        root.setProperty("--gradient-end", t.gradientEnd);
-        root.setProperty("--accent", t.accent);
-        root.setProperty("--text-on-glass", t.textOnGlass);
-        root.setProperty("--text-on-glass-secondary", t.textOnGlassSecondary);
+        if (hexRe.test(t.gradientStart)) root.setProperty("--gradient-start", t.gradientStart);
+        if (hexRe.test(t.gradientEnd)) root.setProperty("--gradient-end", t.gradientEnd);
+        if (hexRe.test(t.accent)) root.setProperty("--accent", t.accent);
+        if (hexRe.test(t.textOnGlass)) root.setProperty("--text-on-glass", t.textOnGlass);
+        if (hexRe.test(t.textOnGlassSecondary) || rgbaRe.test(t.textOnGlassSecondary))
+          root.setProperty("--text-on-glass-secondary", t.textOnGlassSecondary);
       }
 
       // Show UI
