@@ -243,7 +243,7 @@ The multi-stage `Dockerfile` builds the Vue frontend, compiles the TypeScript ba
 
 On Cloud Run, GCS authentication is automatic via the service account — no credentials file needed. Locally, use `gcloud auth application-default login`.
 
-> See the [Cloud Deployment Proof video](PLACEHOLDER) for a screen recording of the backend running on Google Cloud.
+> See the [Cloud Deployment Proof video](https://drive.google.com/file/d/10cDKyNLhFHyIigwpDjcJD8YeeMsc7PyP/view?usp=drive_link) for a screen recording of the backend running on Google Cloud.
 
 ---
 
@@ -379,7 +379,7 @@ doc2story/
 | Interleaved/mixed output | Yes | `responseModalities: [TEXT, IMAGE]` — core of course generation |
 | Text description | Yes | This README |
 | Public code repository | Yes | This repository |
-| Cloud deployment proof | Yes | [See recording](PLACEHOLDER) |
+| Cloud deployment proof | Yes | [See recording](https://drive.google.com/file/d/10cDKyNLhFHyIigwpDjcJD8YeeMsc7PyP/view?usp=drive_link) |
 | Architecture diagram | Yes | [`architecture.html`](architecture.html) |
 | Demo video (<4 min) | Yes | [Watch demo](PLACEHOLDER) |
 
