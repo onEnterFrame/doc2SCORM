@@ -4,7 +4,7 @@
 
 > **An AI Creative Director that transforms static documents into immersive, story-driven eLearning courses** — with interleaved illustrations, adaptive color themes, professional narration, interactive decision points, quizzes, and a **public gallery** for sharing — all from a single multimodal Gemini generation.
 >
-> **Live app:** [https://doc2scorm-backend-[YOUR_HASH]-uc.a.run.app](https://doc2scorm-backend-[YOUR_HASH]-uc.a.run.app) *(update after deploy)*
+> **Live app:** [https://doc2scorm-backend-531437972620.us-central1.run.app](https://doc2scorm-backend-531437972620.us-central1.run.app)
 
 ---
 
