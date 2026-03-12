@@ -21,7 +21,7 @@ Converting these documents into engaging eLearning courses currently requires a 
 ## Demo Video
 
 <!-- Replace with actual demo video -->
-[Watch the 4-minute demo](https://www.youtube.com/PLACEHOLDER)
+[Watch the 4-minute demo](https://youtu.be/MW1PiMkM96Q)
 
 ---
 
@@ -381,7 +381,7 @@ doc2story/
 | Public code repository | Yes | This repository |
 | Cloud deployment proof | Yes | [See recording](https://drive.google.com/file/d/10cDKyNLhFHyIigwpDjcJD8YeeMsc7PyP/view?usp=drive_link) |
 | Architecture diagram | Yes | [`architecture.html`](architecture.html) |
-| Demo video (<4 min) | Yes | [Watch demo](PLACEHOLDER) |
+| Demo video (<4 min) | Yes | [Watch demo](https://youtu.be/MW1PiMkM96Q) |
 
 ---
 
